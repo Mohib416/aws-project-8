@@ -125,6 +125,25 @@ resource "aws_lb_listener" "http_listener" {
   protocol          = "HTTP"
 
   default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "https_listener" {
+  load_balancer_arn = aws_lb.app_alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+
+  certificate_arn = "arn:aws:acm:eu-west-1:257289933091:certificate/25e0bb5e-6336-445f-a985-665d7676f05a"
+
+  default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app_tg.arn
   }
@@ -178,6 +197,16 @@ resource "aws_ecs_task_definition" "app_task" {
           containerPort = 80
         }
       ]
+
+      logConfiguration = {
+        logDriver = "awslogs"
+
+        options = {
+          awslogs-group         = "/ecs/project-8"
+          awslogs-region        = "eu-west-1"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     }
   ])
 }
@@ -209,7 +238,7 @@ resource "aws_ecs_service" "app_service" {
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.app_task.arn
   launch_type     = "FARGATE"
-  desired_count   = 2
+  desired_count   = 1
 
   network_configuration {
     subnets = [
@@ -228,4 +257,34 @@ resource "aws_ecs_service" "app_service" {
   }
 
   depends_on = [aws_lb_listener.http_listener]
+}
+resource "aws_cloudwatch_log_group" "ecs_logs" {
+  name              = "/ecs/project-8"
+  retention_in_days = 7
+}
+resource "aws_appautoscaling_target" "ecs_target" {
+  max_capacity       = 3
+  min_capacity       = 1
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.app_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+resource "aws_appautoscaling_policy" "ecs_policy" {
+  name               = "ecs-cpu-autoscaling"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_target.resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_target.scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_target.service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value = 70.0
+
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+
+    scale_in_cooldown  = 60
+    scale_out_cooldown = 60
+  }
 }
