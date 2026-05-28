@@ -239,23 +239,23 @@ This helped me better understand how AWS services work together in real-world en
 
 ### ECS Service Running
 
-![ECS Service](screenshots/ecs_service_running.png)
+![ECS Service](screenshots/86_ecs_running_tasks_after_scale_up.png)
 
 ### CI/CD Success
 
-![CI/CD](screenshots/cicd_success.png)
+![CI/CD](screenshots/66_github_actions_success.png)
 
 ### HTTPS Working Domain
 
-![HTTPS](screenshots/https_working.png)
+![HTTPS](screenshots/91_root_domain_https_live.png)
 
 ### CloudWatch Metrics
 
-![CloudWatch](screenshots/cloudwatch_metrics.png)
+![CloudWatch](screenshots/96_alb_monitoring_metrics.png)
 
 ### Auto Scaling
 
-![Autoscaling](screenshots/autoscaling.png)
+![Autoscaling](screenshots/85_ecs_autoscaling_3_tasks_running.png)
 
 ---
 
