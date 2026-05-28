@@ -235,7 +235,7 @@ This helped me better understand how AWS services work together in real-world en
 
 ### Architecture Diagram
 
-![Architecture](screenshots/project8_aws_ecs_architecture_diagram.png)
+![Architecture Diagram](Diagram/Project%208%20Diagram.png)
 
 ### ECS Service Running
 
