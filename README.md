@@ -23,7 +23,7 @@ This project includes:
 
 ## 🏗️ Architecture Diagram
 
-![Architecture Diagram](screenshots/project8_aws_ecs_architecture_diagram.png)
+![Architecture Diagram](Diagram/Project%208%20Diagram.png)
 
 ---
 
